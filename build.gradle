@@ -1,0 +1,25 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+
+}
+
+buildscript {
+    ext.junit_version = "5.5.1"
+    project.version = "1.0"
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
