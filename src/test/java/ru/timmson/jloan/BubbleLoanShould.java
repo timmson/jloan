@@ -7,11 +7,11 @@ import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DiffirientedLoanShould {
+public class BubbleLoanShould {
 
     @Test
     void calculateSchedule() {
-        final var loan = DiffirientedLoan
+        final var loan = BubbleLoan
                 .builder()
                 .amount(valueOf(50000))
                 .annualInterestRate(valueOf(11.5))
@@ -22,8 +22,11 @@ public class DiffirientedLoanShould {
 
         final var schedule = loan.getSchedule();
 
+        schedule.getPayments().forEach(System.out::println);
+
         assertEquals(13, schedule.getPayments().size());
-        assertEquals(valueOf(4206.01), schedule.getPayments().get(12).getAmount());
-        assertEquals(valueOf(3111.18), schedule.getOverallInterest());
+        assertEquals(ZERO, schedule.getPayments().get(1).getPrincipalAmount());
+        assertEquals(valueOf(50000), schedule.getPayments().get(12).getPrincipalAmount());
+        assertEquals(valueOf(5747.13), schedule.getOverallInterest());
     }
 }

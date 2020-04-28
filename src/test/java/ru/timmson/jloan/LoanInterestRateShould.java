@@ -8,11 +8,11 @@ import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LoanYearShould {
+public class LoanInterestRateShould {
 
     @Test
     void calculateAmountOfPercentWhenDaysGiven() {
-        final var loanYear = new LoanYear(valueOf(16.8));
+        final var loanYear = new LoanInterestRate(valueOf(16.8));
 
         BigDecimal result = loanYear.calculate(valueOf(1000), 30, false);
 
@@ -21,7 +21,7 @@ public class LoanYearShould {
 
     @Test
     void calculateAmountOfPercentWhenDatesGiven() {
-        final var loanYear = new LoanYear(valueOf(16.8));
+        final var loanYear = new LoanInterestRate(valueOf(16.8));
 
         BigDecimal result = loanYear.calculate(valueOf(1000), of(2015,11,10), of(2015,12,10));
 
@@ -30,7 +30,7 @@ public class LoanYearShould {
 
     @Test
     void calculateAmountOfPercentWhenDatesInDifferentYearGiven() {
-        final var loanYear = new LoanYear(valueOf(16.7));
+        final var loanYear = new LoanInterestRate(valueOf(16.7));
 
         BigDecimal result = loanYear.calculate(valueOf(1000), of(2015,12,10), of(2016,1,10));
 
