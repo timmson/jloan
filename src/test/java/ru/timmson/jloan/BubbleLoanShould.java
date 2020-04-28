@@ -22,8 +22,6 @@ public class BubbleLoanShould {
 
         final var schedule = loan.getSchedule();
 
-        schedule.getPayments().forEach(System.out::println);
-
         assertEquals(13, schedule.getPayments().size());
         assertEquals(ZERO, schedule.getPayments().get(1).getPrincipalAmount());
         assertEquals(valueOf(50000), schedule.getPayments().get(12).getPrincipalAmount());
