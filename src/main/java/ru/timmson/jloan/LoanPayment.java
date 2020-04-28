@@ -11,6 +11,8 @@ import static java.math.BigDecimal.ZERO;
 
 /**
  * Loan payment DTO
+ *
+ * @author Artem Krotov
  */
 @Getter
 @Builder

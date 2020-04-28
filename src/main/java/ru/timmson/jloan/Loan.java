@@ -1,7 +1,9 @@
 package ru.timmson.jloan;
 
 /**
- *  Loan interface
+ * Loan interface
+ *
+ * @author Artem Krotov
  */
 public interface Loan {
 

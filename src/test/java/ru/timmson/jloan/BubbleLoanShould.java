@@ -6,13 +6,14 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ru.timmson.jloan.LoanType.BUBBLE;
 
 public class BubbleLoanShould {
 
     @Test
     void calculateSchedule() {
-        final var loan = BubbleLoan
-                .builder()
+        final var loan = LoanFactory
+                .build(BUBBLE)
                 .amount(valueOf(50000))
                 .annualInterestRate(valueOf(11.5))
                 .termInMonth(12)

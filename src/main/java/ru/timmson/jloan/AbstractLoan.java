@@ -7,6 +7,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link AbstractLoan} class
+ *
+ * @author Artem Krotov
+ */
 @ToString
 abstract class AbstractLoan implements Loan {
     protected BigDecimal amount;
@@ -46,35 +51,40 @@ abstract class AbstractLoan implements Loan {
      */
     protected abstract List<LoanPayment> getPayments();
 
-    protected static class LoanBuilder<L extends AbstractLoan> {
+    protected static class AbstractLoanBuilder<L extends AbstractLoan> implements LoanBuilder<L> {
 
         protected final L loan;
 
-        protected LoanBuilder(L loan) {
+        protected AbstractLoanBuilder(L loan) {
             this.loan = loan;
         }
 
-        public LoanBuilder<L> amount(BigDecimal amount) {
+        @Override
+        public AbstractLoanBuilder<L> amount(BigDecimal amount) {
             this.loan.amount = amount;
             return this;
         }
 
-        public LoanBuilder<L> annualInterestRate(BigDecimal annualInterestRate) {
+        @Override
+        public AbstractLoanBuilder<L> annualInterestRate(BigDecimal annualInterestRate) {
             this.loan.interestRate = new LoanInterestRate(annualInterestRate);
             return this;
         }
 
-        public LoanBuilder<L> termInMonth(int termInMonth) {
+        @Override
+        public AbstractLoanBuilder<L> termInMonth(int termInMonth) {
             this.loan.termInMonth = termInMonth;
             return this;
         }
 
-        public LoanBuilder<L> paymentOnDay(int paymentOnDay) {
+        @Override
+        public AbstractLoanBuilder<L> paymentOnDay(int paymentOnDay) {
             this.loan.paymentOnDay = paymentOnDay;
             return this;
         }
 
-        public LoanBuilder<L> issueDate(LocalDate issueDate) {
+        @Override
+        public AbstractLoanBuilder<L> issueDate(LocalDate issueDate) {
             this.loan.issueDate = issueDate;
             return this;
         }

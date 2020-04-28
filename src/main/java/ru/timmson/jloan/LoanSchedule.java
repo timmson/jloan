@@ -9,12 +9,16 @@ import java.time.Period;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.math.RoundingMode.HALF_UP;
 
+/**
+ * LoanSchedule DTO
+ *
+ * @author Artem Krotov
+ */
 @Getter
 @ToString
 class LoanSchedule {

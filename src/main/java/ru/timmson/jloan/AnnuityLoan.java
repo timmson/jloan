@@ -10,11 +10,13 @@ import static java.math.RoundingMode.HALF_UP;
  * Loan with equals ("annuity") payments
  * <p>
  * Monthly payment are equal and consists of principal amount and and interest amount of each month
+ *
+ * @author Artem Krotov
  */
 public class AnnuityLoan extends AbstractLoan {
 
-    public static AnnuityLoanBuilder builder() {
-        return new AnnuityLoanBuilder(new AnnuityLoan());
+    static AnnuityAbstractLoanBuilder builder() {
+        return new AnnuityAbstractLoanBuilder(new AnnuityLoan());
     }
 
     /**
@@ -65,9 +67,9 @@ public class AnnuityLoan extends AbstractLoan {
         return payments;
     }
 
-    public static class AnnuityLoanBuilder extends LoanBuilder<AnnuityLoan> {
+    public static class AnnuityAbstractLoanBuilder extends AbstractLoanBuilder<AnnuityLoan> {
 
-        protected AnnuityLoanBuilder(AnnuityLoan loan) {
+        protected AnnuityAbstractLoanBuilder(AnnuityLoan loan) {
             super(loan);
         }
 

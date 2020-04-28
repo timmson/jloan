@@ -1,7 +1,5 @@
 package ru.timmson.jloan;
 
-import lombok.ToString;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -10,14 +8,15 @@ import static java.math.BigDecimal.valueOf;
 
 /**
  * Loan with diffiriented payments
- *
+ * <p>
  * Monthly payment consists of equal portion of loan amount and interest amount of each month
  *
+ * @author Artem Krotov
  */
 public class DiffirientedLoan extends AbstractDiffirientedLoan {
 
-    public static DiffirientedLoanBuilder builder() {
-        return new DiffirientedLoanBuilder(new DiffirientedLoan());
+    static DiffirientedAbstractLoanBuilder builder() {
+        return new DiffirientedAbstractLoanBuilder(new DiffirientedLoan());
     }
 
     /**
@@ -34,9 +33,9 @@ public class DiffirientedLoan extends AbstractDiffirientedLoan {
     /**
      * Build {@code DiffirientedLoan}
      */
-    public static class DiffirientedLoanBuilder extends LoanBuilder<DiffirientedLoan> {
+    public static class DiffirientedAbstractLoanBuilder extends AbstractLoanBuilder<DiffirientedLoan> {
 
-        public DiffirientedLoanBuilder(DiffirientedLoan loan) {
+        public DiffirientedAbstractLoanBuilder(DiffirientedLoan loan) {
             super(loan);
         }
     }
