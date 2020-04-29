@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.timmson.jloan.LoanType.ANNUITY;
+import static ru.timmson.jloan.LoanFactory.annuityLoanBuilder;
 
 public class AnnuityLoanShould {
 
@@ -25,8 +25,7 @@ public class AnnuityLoanShould {
 
     @Test
     void calculateSchedule() {
-        final var loan = LoanFactory
-                .build(ANNUITY)
+        final var loan = annuityLoanBuilder()
                 .amount(valueOf(500000))
                 .annualInterestRate(valueOf(11.5))
                 .termInMonth(12)
