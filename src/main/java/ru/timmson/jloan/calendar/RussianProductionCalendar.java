@@ -3,6 +3,7 @@ package ru.timmson.jloan.calendar;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static ru.timmson.jloan.calendar.ProductionYears.get2020;
 
 /**
@@ -48,8 +49,21 @@ public class RussianProductionCalendar implements ProductionCalendar {
         return this.holidays.getOrDefault(date.getYear(), ProductionYears::isSatOrSun).isHoliday(date);
     }
 
+    /**
+     * Returns next working date
+     *
+     * @param date - given date
+     * @return the closest working date
+     */
     @Override
     public LocalDate getNextWorkDay(LocalDate date) {
-        throw new UnsupportedOperationException();
+        var isForward = true;
+        while (isHoliday(date)) {
+            if (date.isEqual(date.with(lastDayOfMonth()))) {
+                isForward = false;
+            }
+            date = isForward ? date.plusDays(1) : date.minusDays(1);
+        }
+        return date;
     }
 }

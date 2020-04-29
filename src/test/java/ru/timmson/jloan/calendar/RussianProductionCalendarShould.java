@@ -20,7 +20,7 @@ public class RussianProductionCalendarShould {
 
     @Test
     void returnNextWorkingDayInCurrentMonth() {
-        //assertEquals(of(2020, 5,6), ruCalendar.getNextWorkDay(of(2020, 5,4)));
-        //assertEquals(of(2020, 5,29), ruCalendar.getNextWorkDay(of(2020, 5,31)));
+        assertEquals(of(2020, 5, 6), ruCalendar.getNextWorkDay(of(2020, 5, 4)));
+        assertEquals(of(2020, 5, 29), ruCalendar.getNextWorkDay(of(2020, 5, 31)));
     }
 }

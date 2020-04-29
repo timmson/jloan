@@ -21,7 +21,7 @@ public interface ProductionCalendar {
      * Returns next working date
      *
      * @param date - given date
-     * @return
+     * @return the closest working date
      */
     LocalDate getNextWorkDay(LocalDate date);
 }

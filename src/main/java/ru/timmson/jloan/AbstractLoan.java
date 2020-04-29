@@ -1,6 +1,7 @@
 package ru.timmson.jloan;
 
 import lombok.ToString;
+import ru.timmson.jloan.calendar.ProductionCalendar;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ abstract class AbstractLoan implements Loan {
     protected int termInMonth;
     protected int paymentOnDay;
     protected LocalDate issueDate;
+    protected ProductionCalendar productionCalendar;
 
     protected AbstractLoan() {
     }
@@ -47,9 +49,22 @@ abstract class AbstractLoan implements Loan {
     /**
      * Generate payments
      *
-     * @return  list of {@link LoanPayment}
+     * @return list of {@link LoanPayment}
      */
     protected abstract List<LoanPayment> getPayments();
+
+    /**
+     * Returns next working date if ProductionCalendar is not null
+     *
+     * @param date - given date
+     * @return the closest working date
+     */
+    protected LocalDate getNextWorkingDate(LocalDate date) {
+        if (productionCalendar != null) {
+            date = productionCalendar.getNextWorkDay(date);
+        }
+        return date;
+    }
 
     protected static class AbstractLoanBuilder<L extends AbstractLoan> implements LoanBuilder<L> {
 
@@ -86,6 +101,12 @@ abstract class AbstractLoan implements Loan {
         @Override
         public AbstractLoanBuilder<L> issueDate(LocalDate issueDate) {
             this.loan.issueDate = issueDate;
+            return this;
+        }
+
+        @Override
+        public AbstractLoanBuilder<L> productionCalendar(ProductionCalendar productionCalendar) {
+            this.loan.productionCalendar = productionCalendar;
             return this;
         }
 
