@@ -23,10 +23,12 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
         var i = 0;
         var date = issueDate;
         while (i++ < termInMonth) {
-            date = date.plusMonths(1).withDayOfMonth(paymentOnDay);
+            date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
+
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
             final var interestPayment = interestRate.calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
             final var principalPayment = (i == termInMonth ? initialBalance : fixedPrincipalPaymentPart);
+
             payments.add(LoanPayment
                     .builder()
                     .initialBalance(initialBalance)

@@ -26,6 +26,8 @@ public class LoanPayment {
     @Builder.Default
     private BigDecimal amount = ZERO;
     @Builder.Default
+    private BigDecimal annuityAmount = ZERO;
+    @Builder.Default
     private BigDecimal interestAmount = ZERO;
     @Builder.Default
     private BigDecimal principalAmount = ZERO;
