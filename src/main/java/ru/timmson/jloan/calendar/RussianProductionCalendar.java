@@ -47,4 +47,9 @@ public class RussianProductionCalendar implements ProductionCalendar {
     public boolean isHoliday(LocalDate date) {
         return this.holidays.getOrDefault(date.getYear(), ProductionYears::isSatOrSun).isHoliday(date);
     }
+
+    @Override
+    public LocalDate getNextWorkDay(LocalDate date) {
+        throw new UnsupportedOperationException();
+    }
 }

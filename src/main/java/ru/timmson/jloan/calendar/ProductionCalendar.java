@@ -10,11 +10,18 @@ import java.time.LocalDate;
 public interface ProductionCalendar {
 
     /**
-     * Check if holiday in given day or not
+     * Checks if holiday in given day or not
      *
      * @param date - given date
      * @return true of false
      */
     boolean isHoliday(LocalDate date);
 
+    /**
+     * Returns next working date
+     *
+     * @param date - given date
+     * @return
+     */
+    LocalDate getNextWorkDay(LocalDate date);
 }
