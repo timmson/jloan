@@ -25,16 +25,20 @@ public class AnnuityLoan extends AbstractLoan {
      * @return {@link BigDecimal}
      */
     public BigDecimal getAnnuityPayment() {
-        final var monthlyInterestRate = this.interestRate.getAnnualInterestRate().divide(BigDecimal.valueOf(100 * 12), DECIMAL32);
-        final var ip1 = (monthlyInterestRate.add(BigDecimal.ONE)).pow(this.termInMonth);
-        return this.amount.multiply(monthlyInterestRate.multiply(ip1).divide(ip1.subtract(BigDecimal.ONE), DECIMAL32)).setScale(2, HALF_UP);
+        return getAnnuityPayment(this.amount, this.termInMonth, this.interestRate.getAnnualInterestRate());
+    }
+
+    protected BigDecimal getAnnuityPayment(BigDecimal amount, int termInMonth, BigDecimal annulInterestRate) {
+        final var monthlyInterestRate = annulInterestRate.divide(BigDecimal.valueOf(100 * 12), DECIMAL32);
+        final var ip1 = (monthlyInterestRate.add(BigDecimal.ONE)).pow(termInMonth);
+        return amount.multiply(monthlyInterestRate.multiply(ip1).divide(ip1.subtract(BigDecimal.ONE), DECIMAL32)).setScale(2, HALF_UP);
     }
 
 
     /**
      * Generate payments
      *
-     * @return  list of {@link LoanPayment}
+     * @return list of {@link LoanPayment}
      */
     @Override
     protected List<LoanPayment> getPayments() {
@@ -49,6 +53,7 @@ public class AnnuityLoan extends AbstractLoan {
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
             final var interestPayment = interestRate.calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
 
+            final var currentAnnuityPayment = getAnnuityPayment(initialBalance, termInMonth - i + 1, this.interestRate.getAnnualInterestRate());
             final var payment = ((i == termInMonth) ? initialBalance.add(interestPayment) : annuityPayment);
             final var principalPayment = payment.subtract(interestPayment);
 
@@ -59,7 +64,7 @@ public class AnnuityLoan extends AbstractLoan {
                     .amount(payment)
                     .principalAmount(principalPayment)
                     .interestAmount(interestPayment)
-                    .annuityAmount(annuityPayment)
+                    .annuityAmount(currentAnnuityPayment)
                     .interestRate(this.interestRate.getAnnualInterestRate())
                     .finalBalance(initialBalance.subtract(principalPayment))
                     .build()

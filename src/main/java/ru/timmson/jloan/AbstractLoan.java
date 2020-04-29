@@ -1,6 +1,5 @@
 package ru.timmson.jloan;
 
-import lombok.ToString;
 import ru.timmson.jloan.calendar.ProductionCalendar;
 
 import java.math.BigDecimal;
@@ -13,7 +12,6 @@ import java.util.List;
  *
  * @author Artem Krotov
  */
-@ToString
 abstract class AbstractLoan implements Loan {
     protected BigDecimal amount;
     protected LoanInterestRate interestRate;

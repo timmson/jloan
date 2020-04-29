@@ -1,7 +1,6 @@
 package ru.timmson.jloan;
 
 import lombok.Getter;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -9,6 +8,7 @@ import java.time.Period;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
@@ -20,7 +20,6 @@ import static java.math.RoundingMode.HALF_UP;
  * @author Artem Krotov
  */
 @Getter
-@ToString
 class LoanSchedule {
 
     private final BigDecimal overallInterest;
@@ -61,4 +60,18 @@ class LoanSchedule {
         return Collections.unmodifiableList(this.payments);
     }
 
+    @Override
+    public String toString() {
+        return "LoanSchedule{" +
+                "overallInterest=" + overallInterest +
+                ", firstPayment=" + firstPayment +
+                ", lastPayment=" + lastPayment +
+                ", minPaymentAmount=" + minPaymentAmount +
+                ", maxPaymentAmount=" + maxPaymentAmount +
+                ", termInMonth=" + termInMonth +
+                ", amount=" + amount +
+                ", efficientRate=" + efficientRate +
+                ", fullAmount=" + fullAmount +
+                '}' + "\n" + payments.stream().map(LoanPayment::toString).collect(Collectors.joining("\n"));
+    }
 }

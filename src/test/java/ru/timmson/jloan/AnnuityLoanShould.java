@@ -55,6 +55,8 @@ public class AnnuityLoanShould {
 
         final var schedule = loan.getSchedule();
 
+        System.out.println(schedule);
+
         assertEquals(13, schedule.getPayments().size());
         assertEquals(valueOf(42623.17), schedule.getPayments().get(12).getAmount());
         assertEquals(valueOf(30006.00).setScale(2, HALF_UP), schedule.getOverallInterest());
