@@ -1,5 +1,7 @@
 package ru.timmson.jloan;
 
+import lombok.experimental.SuperBuilder;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -13,11 +15,8 @@ import static java.math.BigDecimal.valueOf;
  *
  * @author Artem Krotov
  */
+@SuperBuilder
 public class DiffirientedLoan extends AbstractDiffirientedLoan {
-
-    static DiffirientedAbstractLoanBuilder builder() {
-        return new DiffirientedAbstractLoanBuilder(new DiffirientedLoan());
-    }
 
     /**
      * Returns amount of principal monthly payment
@@ -28,16 +27,6 @@ public class DiffirientedLoan extends AbstractDiffirientedLoan {
      */
     protected BigDecimal getFixedPrincipalPaymentPart() {
         return amount.divide(valueOf(termInMonth), MathContext.DECIMAL32).setScale(2, RoundingMode.HALF_UP);
-    }
-
-    /**
-     * Build {@code DiffirientedLoan}
-     */
-    public static class DiffirientedAbstractLoanBuilder extends AbstractLoanBuilder<DiffirientedLoan> {
-
-        public DiffirientedAbstractLoanBuilder(DiffirientedLoan loan) {
-            super(loan);
-        }
     }
 
 }

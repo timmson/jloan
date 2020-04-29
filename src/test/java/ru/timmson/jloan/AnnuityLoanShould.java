@@ -43,6 +43,24 @@ public class AnnuityLoanShould {
     }
 
     @Test
+    void calculateScheduleWithFixedPayment() {
+        final var loan = annuityLoanBuilder()
+                .amount(valueOf(500000))
+                .annualInterestRate(valueOf(11.5))
+                .termInMonth(12)
+                .paymentAmount(valueOf(57000))
+                .paymentOnDay(25)
+                .issueDate(of(2018, 10, 25))
+                .build();
+
+        final var schedule = loan.getSchedule();
+
+        assertEquals(schedule.getTermInMonth(), schedule.getPayments().size() - 1);
+        assertEquals(valueOf(11804.06), schedule.getPayments().get((int) schedule.getTermInMonth()).getAmount());
+        assertEquals(valueOf(24804.06), schedule.getOverallInterest());
+    }
+
+    @Test
     void calculateScheduleWithRussianCalendar() {
         final var loan = annuityLoanBuilder()
                 .amount(valueOf(500000))
@@ -54,8 +72,6 @@ public class AnnuityLoanShould {
                 .build();
 
         final var schedule = loan.getSchedule();
-
-        System.out.println(schedule);
 
         assertEquals(13, schedule.getPayments().size());
         assertEquals(valueOf(42623.17), schedule.getPayments().get(12).getAmount());

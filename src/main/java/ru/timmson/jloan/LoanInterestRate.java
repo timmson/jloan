@@ -17,7 +17,6 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 class LoanInterestRate {
 
     private final BigDecimal interestRate;
-    private final BigDecimal annualInterestRate;
 
     /**
      * Creates {@link LoanInterestRate}
@@ -25,17 +24,7 @@ class LoanInterestRate {
      * @param annualInterestRate - annual interest rate, e.g. 14.99
      */
     public LoanInterestRate(BigDecimal annualInterestRate) {
-        this.annualInterestRate = annualInterestRate;
         this.interestRate = annualInterestRate.divide(valueOf(100), DECIMAL32);
-    }
-
-    /**
-     * Returns annual interest rate
-     *
-     * @return - annual interest rate, e.g. 14.99
-     */
-    public BigDecimal getAnnualInterestRate() {
-        return annualInterestRate;
     }
 
     /**

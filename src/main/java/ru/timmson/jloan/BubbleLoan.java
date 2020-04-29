@@ -1,5 +1,7 @@
 package ru.timmson.jloan;
 
+import lombok.experimental.SuperBuilder;
+
 import java.math.BigDecimal;
 
 import static java.math.BigDecimal.ZERO;
@@ -13,11 +15,8 @@ import static java.math.BigDecimal.ZERO;
  *
  * @author Artem Krotov
  */
+@SuperBuilder
 public class BubbleLoan extends AbstractDiffirientedLoan {
-
-    static BubbleAbstractLoanBuilder builder() {
-        return new BubbleAbstractLoanBuilder(new BubbleLoan());
-    }
 
     /**
      * Returns amount of principal monthly payment
@@ -31,13 +30,4 @@ public class BubbleLoan extends AbstractDiffirientedLoan {
         return ZERO;
     }
 
-    /**
-     * Build {@code BubbleLoan}
-     */
-    public static class BubbleAbstractLoanBuilder extends AbstractLoanBuilder<BubbleLoan> {
-
-        public BubbleAbstractLoanBuilder(BubbleLoan loan) {
-            super(loan);
-        }
-    }
 }

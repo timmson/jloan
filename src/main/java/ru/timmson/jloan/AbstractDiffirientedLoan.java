@@ -1,13 +1,18 @@
 package ru.timmson.jloan;
 
+import lombok.experimental.SuperBuilder;
+
 import java.math.BigDecimal;
 import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
 
 /**
  * Abstract Loan with diffiriented payments
  *
  * @author Artem Krotov
  */
+@SuperBuilder
 public abstract class AbstractDiffirientedLoan extends AbstractLoan {
 
     /**
@@ -22,11 +27,11 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
 
         var i = 0;
         var date = issueDate;
-        while (i++ < termInMonth) {
+        while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
-            final var interestPayment = interestRate.calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
+            final var interestPayment = getLoanInterestRate().calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
             final var principalPayment = (i == termInMonth ? initialBalance : fixedPrincipalPaymentPart);
 
             payments.add(LoanPayment
@@ -36,7 +41,7 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
                     .principalAmount(principalPayment)
                     .interestAmount(interestPayment)
                     .amount(principalPayment.add(interestPayment))
-                    .interestRate(this.interestRate.getAnnualInterestRate())
+                    .interestRate(this.annualInterestRate)
                     .finalBalance(initialBalance.subtract(principalPayment))
                     .build()
             );

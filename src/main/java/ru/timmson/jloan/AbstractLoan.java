@@ -1,5 +1,6 @@
 package ru.timmson.jloan;
 
+import lombok.experimental.SuperBuilder;
 import ru.timmson.jloan.calendar.ProductionCalendar;
 
 import java.math.BigDecimal;
@@ -12,40 +13,58 @@ import java.util.List;
  *
  * @author Artem Krotov
  */
+@SuperBuilder
 abstract class AbstractLoan implements Loan {
+
     protected BigDecimal amount;
-    protected LoanInterestRate interestRate;
-    protected int termInMonth;
+    protected BigDecimal annualInterestRate;
+    protected long termInMonth;
     protected int paymentOnDay;
     protected LocalDate issueDate;
     protected ProductionCalendar productionCalendar;
 
-    protected AbstractLoan() {
-    }
+    private LoanInterestRate interestRate;
+    private LoanSchedule loanSchedule;
 
     protected final List<LoanPayment> initPayments() {
         final var payments = new ArrayList<LoanPayment>();
         payments.add(LoanPayment
                 .builder()
                 .date(this.issueDate)
-                .interestRate(this.interestRate.getAnnualInterestRate())
+                .interestRate(this.annualInterestRate)
                 .finalBalance(this.amount)
                 .build());
         return payments;
     }
 
+    protected LoanInterestRate getLoanInterestRate() {
+        synchronized (this) {
+            if (interestRate == null) {
+                interestRate = new LoanInterestRate(annualInterestRate);
+            }
+        }
+        return interestRate;
+    }
+
     /**
-     * Generate schedule
+     * Generates schedule.
+     * <p>
+     * Caches it for next usage.
      *
      * @return - loan schedule {@link LoanSchedule}
      */
     @Override
     public final LoanSchedule getSchedule() {
-        return LoanSchedule.build(getPayments());
+        synchronized (this) {
+            if (loanSchedule == null) {
+                loanSchedule = LoanSchedule.build(getPayments());
+            }
+        }
+        return loanSchedule;
     }
 
     /**
-     * Generate payments
+     * Generates payments
      *
      * @return list of {@link LoanPayment}
      */
@@ -64,53 +83,4 @@ abstract class AbstractLoan implements Loan {
         return date;
     }
 
-    protected static class AbstractLoanBuilder<L extends AbstractLoan> implements LoanBuilder<L> {
-
-        protected final L loan;
-
-        protected AbstractLoanBuilder(L loan) {
-            this.loan = loan;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> amount(BigDecimal amount) {
-            this.loan.amount = amount;
-            return this;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> annualInterestRate(BigDecimal annualInterestRate) {
-            this.loan.interestRate = new LoanInterestRate(annualInterestRate);
-            return this;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> termInMonth(int termInMonth) {
-            this.loan.termInMonth = termInMonth;
-            return this;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> paymentOnDay(int paymentOnDay) {
-            this.loan.paymentOnDay = paymentOnDay;
-            return this;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> issueDate(LocalDate issueDate) {
-            this.loan.issueDate = issueDate;
-            return this;
-        }
-
-        @Override
-        public AbstractLoanBuilder<L> productionCalendar(ProductionCalendar productionCalendar) {
-            this.loan.productionCalendar = productionCalendar;
-            return this;
-        }
-
-        public L build() {
-            return this.loan;
-        }
-
-    }
 }

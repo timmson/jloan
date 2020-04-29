@@ -8,7 +8,6 @@ import java.time.LocalDate;
 /**
  * Interface of Loan Builder
  *
- * @param <L> - extends {@link Loan}
  */
 public interface LoanBuilder<L extends Loan> {
 
@@ -16,7 +15,7 @@ public interface LoanBuilder<L extends Loan> {
 
     LoanBuilder<L> annualInterestRate(BigDecimal annualInterestRate);
 
-    LoanBuilder<L> termInMonth(int termInMonth);
+    LoanBuilder<L> termInMonth(long termInMonth);
 
     LoanBuilder<L> paymentOnDay(int paymentOnDay);
 

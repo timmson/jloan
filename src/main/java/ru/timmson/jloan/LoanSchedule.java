@@ -4,7 +4,6 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.time.Period;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.stream.Collectors;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.math.RoundingMode.HALF_UP;
+import static java.time.temporal.ChronoUnit.MONTHS;
 
 /**
  * LoanSchedule DTO
@@ -27,7 +27,7 @@ class LoanSchedule {
     private final BigDecimal lastPayment;
     private final BigDecimal minPaymentAmount;
     private final BigDecimal maxPaymentAmount;
-    private final int termInMonth;
+    private final long termInMonth;
     private final BigDecimal amount;
     private final BigDecimal efficientRate;
     private final BigDecimal fullAmount;
@@ -44,7 +44,7 @@ class LoanSchedule {
         this.minPaymentAmount = payments.stream().map(LoanPayment::getAmount).min(Comparator.naturalOrder()).orElse(ZERO);
         this.maxPaymentAmount = payments.stream().map(LoanPayment::getAmount).max(Comparator.naturalOrder()).orElse(ZERO);
 
-        this.termInMonth = Period.between(firstPayment.getDate(), lastPayment.getDate()).getMonths();
+        this.termInMonth = MONTHS.between(firstPayment.getDate(), lastPayment.getDate());
         this.amount = firstPayment.getFinalBalance();
 
         this.overallInterest = payments.stream().map(LoanPayment::getInterestAmount).reduce(BigDecimal::add).orElse(ZERO);

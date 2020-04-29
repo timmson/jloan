@@ -1,36 +1,38 @@
 package ru.timmson.jloan;
 
-import java.util.Map;
-
-import static ru.timmson.jloan.LoanType.*;
-
 /**
- * LoanFactory
+ * LoanFactory returns builder for loans
  *
  * @author Artem Krotov
  */
 public class LoanFactory {
 
-    private static final Map<LoanType, ? extends LoanBuilder<? extends Loan>> LOANS = Map.of(
-            ANNUITY, AnnuityLoan.builder(),
-            BUBBLE, BubbleLoan.builder(),
-            DIFFERENTIATED, DiffirientedLoan.builder()
-    );
 
-    public static LoanBuilder<? extends Loan> annuityLoanBuilder() {
-        return LOANS.get(ANNUITY);
+    /**
+     * Returns AnnuityLoanBuilder
+     *
+     * @return {@link AnnuityLoan.AnnuityLoanBuilder}
+     */
+    public static AnnuityLoan.AnnuityLoanBuilder<?, ?> annuityLoanBuilder() {
+        return AnnuityLoan.builder();
     }
 
-    public static LoanBuilder<? extends Loan> bubbleLoanBuilder() {
-        return LOANS.get(BUBBLE);
+    /**
+     * Returns BubbleLoanBuilder
+     *
+     * @return {@link BubbleLoan.BubbleLoanBuilder}
+     */
+    public static BubbleLoan.BubbleLoanBuilder<?, ?> bubbleLoanBuilder() {
+        return BubbleLoan.builder();
     }
 
-    public static LoanBuilder<? extends Loan> differentiatedLoanBuilder() {
-        return LOANS.get(DIFFERENTIATED);
-    }
-
-    public static LoanBuilder<? extends Loan> builder(LoanType loanType) {
-        return LOANS.get(loanType);
+    /**
+     * Returns DiffirientedLoanBuilder
+     *
+     * @return {@link DiffirientedLoan.DiffirientedLoanBuilder}
+     */
+    public static DiffirientedLoan.DiffirientedLoanBuilder<?, ?> differentiatedLoanBuilder() {
+        return DiffirientedLoan.builder();
     }
 
 }

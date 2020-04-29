@@ -1,8 +1,12 @@
 package ru.timmson.jloan;
 
+import lombok.experimental.SuperBuilder;
+
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
+import static java.math.BigDecimal.*;
 import static java.math.MathContext.DECIMAL32;
 import static java.math.RoundingMode.HALF_UP;
 
@@ -13,11 +17,10 @@ import static java.math.RoundingMode.HALF_UP;
  *
  * @author Artem Krotov
  */
+@SuperBuilder
 public class AnnuityLoan extends AbstractLoan {
 
-    static AnnuityAbstractLoanBuilder builder() {
-        return new AnnuityAbstractLoanBuilder(new AnnuityLoan());
-    }
+    protected BigDecimal paymentAmount;
 
     /**
      * Returns annuity payment amount
@@ -25,13 +28,13 @@ public class AnnuityLoan extends AbstractLoan {
      * @return {@link BigDecimal}
      */
     public BigDecimal getAnnuityPayment() {
-        return getAnnuityPayment(this.amount, this.termInMonth, this.interestRate.getAnnualInterestRate());
+        return Optional.ofNullable(paymentAmount).orElse(getAnnuityPayment(this.amount, this.termInMonth, this.annualInterestRate));
     }
 
-    protected BigDecimal getAnnuityPayment(BigDecimal amount, int termInMonth, BigDecimal annulInterestRate) {
-        final var monthlyInterestRate = annulInterestRate.divide(BigDecimal.valueOf(100 * 12), DECIMAL32);
-        final var ip1 = (monthlyInterestRate.add(BigDecimal.ONE)).pow(termInMonth);
-        return amount.multiply(monthlyInterestRate.multiply(ip1).divide(ip1.subtract(BigDecimal.ONE), DECIMAL32)).setScale(2, HALF_UP);
+    protected BigDecimal getAnnuityPayment(BigDecimal amount, long termInMonth, BigDecimal annulInterestRate) {
+        final var monthlyInterestRate = annulInterestRate.divide(valueOf(100 * 12), DECIMAL32);
+        final var ip1 = (monthlyInterestRate.add(ONE)).pow((int) termInMonth);
+        return amount.multiply(monthlyInterestRate.multiply(ip1).divide(ip1.subtract(ONE), DECIMAL32)).setScale(2, HALF_UP);
     }
 
 
@@ -47,14 +50,14 @@ public class AnnuityLoan extends AbstractLoan {
 
         var i = 0;
         var date = issueDate;
-        while (i++ < termInMonth) {
+        while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
-            final var interestPayment = interestRate.calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
+            final var interestPayment = getLoanInterestRate().calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
 
-            final var currentAnnuityPayment = getAnnuityPayment(initialBalance, termInMonth - i + 1, this.interestRate.getAnnualInterestRate());
-            final var payment = ((i == termInMonth) ? initialBalance.add(interestPayment) : annuityPayment);
+            final var currentAnnuityPayment = termInMonth - i > 0 ? getAnnuityPayment(initialBalance, termInMonth - i, annualInterestRate) : ZERO;
+            final var payment = ((i == termInMonth || initialBalance.add(interestPayment).compareTo(annuityPayment) <= 0) ? initialBalance.add(interestPayment) : annuityPayment);
             final var principalPayment = payment.subtract(interestPayment);
 
             payments.add(LoanPayment
@@ -65,7 +68,7 @@ public class AnnuityLoan extends AbstractLoan {
                     .principalAmount(principalPayment)
                     .interestAmount(interestPayment)
                     .annuityAmount(currentAnnuityPayment)
-                    .interestRate(this.interestRate.getAnnualInterestRate())
+                    .interestRate(this.annualInterestRate)
                     .finalBalance(initialBalance.subtract(principalPayment))
                     .build()
             );
@@ -74,11 +77,4 @@ public class AnnuityLoan extends AbstractLoan {
         return payments;
     }
 
-    public static class AnnuityAbstractLoanBuilder extends AbstractLoanBuilder<AnnuityLoan> {
-
-        protected AnnuityAbstractLoanBuilder(AnnuityLoan loan) {
-            super(loan);
-        }
-
-    }
 }
