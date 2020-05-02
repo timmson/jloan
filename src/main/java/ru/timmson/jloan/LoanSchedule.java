@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
@@ -62,16 +63,30 @@ class LoanSchedule {
 
     @Override
     public String toString() {
-        return "LoanSchedule{" +
-                "overallInterest=" + overallInterest +
-                ", firstPayment=" + firstPayment +
-                ", lastPayment=" + lastPayment +
-                ", minPaymentAmount=" + minPaymentAmount +
-                ", maxPaymentAmount=" + maxPaymentAmount +
-                ", termInMonth=" + termInMonth +
-                ", amount=" + amount +
-                ", efficientRate=" + efficientRate +
-                ", fullAmount=" + fullAmount +
-                '}' + "\n" + payments.stream().map(LoanPayment::toString).collect(Collectors.joining("\n"));
+        StringBuilder sb = new StringBuilder();
+        String border = IntStream.range(0, 14).mapToObj(i -> "-").collect(Collectors.joining());
+        String allBorder = String.format("+%s+%s+%s+%s+%s+%s+%n", border, border, border, border, border, border);
+        sb.append(allBorder);
+        sb.append(String.format(
+                "| %-12s | %-12s | %-12s | %-27s | %-12s |%n",
+                "", "", "", "Including", ""
+        ));
+        sb.append(String.format(
+                "| %-12s | %-12s | %-12s +%s+%s+ %-12s |%n",
+                "Date", "In. Balance", "Payment", border, border, "Out. Balance"
+        ));
+        sb.append(String.format(
+                "| %-12s | %-12s | %-12s | %-12s | %-12s | %-12s |%n",
+                "", "", "", "Principal", "Interest", ""
+        ));
+        sb.append(allBorder);
+        sb.append(payments.stream().map(LoanPayment::toString).collect(Collectors.joining("")));
+        sb.append(allBorder);
+        sb.append(String.format(
+                "| %-12s | %-12s | %-12s | %-12s | %-12s | %-12s |%n",
+                "", "", fullAmount, amount, overallInterest, ""
+        ));
+        sb.append(allBorder);
+        return sb.toString();
     }
 }

@@ -16,7 +16,6 @@ import static java.math.BigDecimal.ZERO;
  */
 @Getter
 @Builder
-@ToString
 public class LoanPayment {
 
     @Builder.Default
@@ -39,8 +38,11 @@ public class LoanPayment {
     private BigDecimal finalBalance = ZERO;
 
     protected enum LoanPaymentType {
-
         REGULAR, EARLY
+    }
 
+    @Override
+    public String toString() {
+        return String.format("| %-12s | %-12s | %-12s | %-12s | %-12s | %-12s |%n", this.date, this.initialBalance, this.amount, this.principalAmount, this.interestAmount, this.finalBalance);
     }
 }

@@ -47,7 +47,7 @@ public class AnnuityLoan extends AbstractLoan {
     @Override
     protected List<LoanPayment> getPayments() {
         final var payments = initPayments();
-        final var annuityPayment = getAnnuityPayment();
+        var annuityPayment = getAnnuityPayment();
         final var tempEarlyRepayment = new TreeMap<>(getEarlyRepayments());
 
         var i = 0;
@@ -55,16 +55,31 @@ public class AnnuityLoan extends AbstractLoan {
         while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
-            if (!tempEarlyRepayment.isEmpty() && tempEarlyRepayment.firstKey().isBefore(date)) {
-                final var earlyRepaymentEntry = tempEarlyRepayment.pollFirstEntry();
-            }
+            if (!tempEarlyRepayment.isEmpty())
+                if (tempEarlyRepayment.firstKey().isEqual(date)) {
+                    final var earlyRepaymentEntry = tempEarlyRepayment.pollFirstEntry();
+                    final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
+                    final var payment = initialBalance.min(earlyRepaymentEntry.getValue());
+                    payments.add(LoanPayment
+                            .builder()
+                            .paymentType(LoanPayment.LoanPaymentType.EARLY)
+                            .initialBalance(initialBalance)
+                            .date(date)
+                            .amount(payment)
+                            .principalAmount(payment)
+                            .interestRate(this.annualInterestRate)
+                            .finalBalance(initialBalance.subtract(payment))
+                            .build()
+                    );
+                }
 
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
             final var interestPayment = getLoanInterestRate().calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
 
             final var currentAnnuityPayment = termInMonth - i > 0 ? getAnnuityPayment(initialBalance, termInMonth - i, annualInterestRate) : ZERO;
-            final var payment = ((i == termInMonth || initialBalance.add(interestPayment).compareTo(annuityPayment) <= 0) ? initialBalance.add(interestPayment) : annuityPayment);
-            final var principalPayment = payment.subtract(interestPayment);
+            annuityPayment = payments.get(payments.size() - 1).getPaymentType().equals(LoanPayment.LoanPaymentType.EARLY) ? currentAnnuityPayment : annuityPayment;
+            final var principalPayment = (i == termInMonth ? initialBalance : initialBalance.min(annuityPayment.subtract(interestPayment)));
+            final var payment = principalPayment.add(interestPayment);
 
             payments.add(LoanPayment
                     .builder()

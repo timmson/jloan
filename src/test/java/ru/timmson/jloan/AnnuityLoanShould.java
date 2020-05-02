@@ -42,6 +42,26 @@ public class AnnuityLoanShould {
     }
 
     @Test
+    void calculateScheduleWithEarlyRepayment() {
+        final var loan = annuityLoanBuilder()
+                .amount(valueOf(500000))
+                .annualInterestRate(valueOf(11.5))
+                .termInMonth(12)
+                .paymentOnDay(25)
+                .issueDate(of(2018, 10, 25))
+                .addEarlyRepayment(of(2019, 5, 25), valueOf(150000))
+                .build();
+
+        final var schedule = loan.getSchedule();
+
+        System.out.println(schedule);
+
+        assertEquals(13, schedule.getPayments().size());
+        assertEquals(valueOf(20998.41), schedule.getPayments().get(12).getAmount());
+        assertEquals(valueOf(25026.71), schedule.getOverallInterest());
+    }
+
+    @Test
     void calculateScheduleWithFixedPayment() {
         final var loan = annuityLoanBuilder()
                 .amount(valueOf(500000))
