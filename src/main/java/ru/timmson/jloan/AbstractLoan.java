@@ -94,7 +94,6 @@ abstract class AbstractLoan implements Loan {
     }
 
     public static abstract class AbstractLoanBuilder<C extends AbstractLoan, B extends AbstractLoan.AbstractLoanBuilder<C, B>> {
-        private final Map<LocalDate, BigDecimal> earlyRepayments = new TreeMap<>();
         private BigDecimal amount;
         private BigDecimal annualInterestRate;
         private long termInMonth;
@@ -102,6 +101,7 @@ abstract class AbstractLoan implements Loan {
         private LocalDate issueDate;
         private ProductionCalendar productionCalendar;
         private LoanInterestRate interestRate;
+        private final Map<LocalDate, BigDecimal> earlyRepayments = new HashMap<>();
 
         public B amount(BigDecimal amount) {
             this.amount = amount;

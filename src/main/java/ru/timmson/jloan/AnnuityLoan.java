@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static java.math.BigDecimal.*;
 import static java.math.MathContext.DECIMAL32;
@@ -47,11 +48,16 @@ public class AnnuityLoan extends AbstractLoan {
     protected List<LoanPayment> getPayments() {
         final var payments = initPayments();
         final var annuityPayment = getAnnuityPayment();
+        final var tempEarlyRepayment = new TreeMap<>(getEarlyRepayments());
 
         var i = 0;
         var date = issueDate;
         while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
+
+            if (!tempEarlyRepayment.isEmpty() && tempEarlyRepayment.firstKey().isBefore(date)) {
+                final var earlyRepaymentEntry = tempEarlyRepayment.pollFirstEntry();
+            }
 
             final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
             final var interestPayment = getLoanInterestRate().calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);

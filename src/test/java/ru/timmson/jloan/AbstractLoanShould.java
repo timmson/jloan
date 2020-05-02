@@ -2,8 +2,6 @@ package ru.timmson.jloan;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;

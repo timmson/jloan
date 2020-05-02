@@ -20,9 +20,11 @@ import static java.math.BigDecimal.ZERO;
 public class LoanPayment {
 
     @Builder.Default
-    private BigDecimal initialBalance = ZERO;
-    @Builder.Default
     private LocalDate date = LocalDate.MIN;
+    @Builder.Default
+    private LoanPaymentType paymentType = LoanPaymentType.REGULAR;
+    @Builder.Default
+    private BigDecimal initialBalance = ZERO;
     @Builder.Default
     private BigDecimal amount = ZERO;
     @Builder.Default
@@ -36,4 +38,9 @@ public class LoanPayment {
     @Builder.Default
     private BigDecimal finalBalance = ZERO;
 
+    protected enum LoanPaymentType {
+
+        REGULAR, EARLY
+
+    }
 }
