@@ -13,8 +13,7 @@ public class AnnuityLoanShould {
 
     @Test
     void calculateAnnuityAmount() {
-        final var loan = AnnuityLoan
-                .builder()
+        final var loan = annuityLoanBuilder()
                 .amount(valueOf(110000))
                 .annualInterestRate(valueOf(12.9))
                 .termInMonth(60)

@@ -1,5 +1,7 @@
 package ru.timmson.jloan;
 
+import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -14,6 +16,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
  *
  * @author Artem Krotov
  */
+@EqualsAndHashCode
 class LoanInterestRate {
 
     private final BigDecimal interestRate;
