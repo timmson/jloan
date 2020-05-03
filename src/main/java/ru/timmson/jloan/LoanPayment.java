@@ -2,7 +2,6 @@ package ru.timmson.jloan;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,9 +28,11 @@ public class LoanPayment {
     @Builder.Default
     private BigDecimal annuityAmount = ZERO;
     @Builder.Default
+    private BigDecimal principalAmount = ZERO;
+    @Builder.Default
     private BigDecimal interestAmount = ZERO;
     @Builder.Default
-    private BigDecimal principalAmount = ZERO;
+    private BigDecimal interestAccruedAmount = ZERO;
     @Builder.Default
     private BigDecimal interestRate = ZERO;
     @Builder.Default
@@ -43,6 +44,9 @@ public class LoanPayment {
 
     @Override
     public String toString() {
-        return String.format("| %-12s | %-12s | %-12s | %-12s | %-12s | %-12s |%n", this.date, this.initialBalance, this.amount, this.principalAmount, this.interestAmount, this.finalBalance);
+        return String.format(
+                "| %-12s | %-12s | %-12s | %-12s | %-12s | %-12s |%s%n",
+                this.date, this.initialBalance, this.amount, this.principalAmount,
+                this.interestAmount, this.finalBalance, this.interestAccruedAmount);
     }
 }
