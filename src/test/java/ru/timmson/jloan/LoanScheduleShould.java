@@ -19,6 +19,8 @@ class LoanScheduleShould {
     void transformToString() {
         final var result = loanSchedule.toString();
 
+        System.out.println("result = " + result);
+
         assertEquals(938, result.length());
     }
 
