@@ -24,3 +24,5 @@ jobs:
       run: chmod +x gradlew
     - name: Build and Test with Gradle
       run: ./gradlew clean test
+    - name: Cat
+      run: cat /home/runner/work/jloan/jloan/build/reports/tests/test/index.html
