@@ -93,10 +93,16 @@ public class AnnuityLoan extends AbstractLoan {
                     .calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date)
                     .add(payments.get(payments.size() - 1).getInterestAccruedAmount());
 
-            final var interestAccrued = interestPayment.compareTo(annuityPayment) > 0 ? interestPayment.subtract(annuityPayment) : ZERO;
-            interestPayment = interestPayment.compareTo(annuityPayment) > 0 ? annuityPayment : interestPayment;
+            var principalPayment = ZERO;
 
-            final var principalPayment = (i == termInMonth ? initialBalance : initialBalance.min(annuityPayment.subtract(interestPayment)));
+            if (i == termInMonth) {
+                principalPayment = initialBalance;
+            }
+
+            if (interestPayment.compareTo(annuityPayment) < 0) {
+                principalPayment = initialBalance.min(annuityPayment.subtract(interestPayment));
+            }
+
             final var payment = principalPayment.add(interestPayment);
 
             payments.add(LoanPayment
@@ -107,7 +113,7 @@ public class AnnuityLoan extends AbstractLoan {
                     .annuityAmount(currentAnnuityPayment)
                     .principalAmount(principalPayment)
                     .interestAmount(interestPayment)
-                    .interestAccruedAmount(interestAccrued)
+                    .interestAccruedAmount(ZERO)
                     .interestRate(this.annualInterestRate)
                     .finalBalance(initialBalance.subtract(principalPayment))
                     .build()

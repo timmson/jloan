@@ -23,7 +23,7 @@ abstract class AbstractLoan implements Loan {
     protected ProductionCalendar productionCalendar;
     protected Map<LocalDate, BigDecimal> earlyRepayments;
 
-    private LoanInterestRate interestRate;
+    private final LoanInterestRate interestRate;
     private LoanSchedule loanSchedule;
 
     protected AbstractLoan(AbstractLoanBuilder<?, ?> b) {
@@ -145,8 +145,5 @@ abstract class AbstractLoan implements Loan {
 
         public abstract C build();
 
-        public String toString() {
-            return "AbstractLoan.AbstractLoanBuilder(amount=" + this.amount + ", annualInterestRate=" + this.annualInterestRate + ", termInMonth=" + this.termInMonth + ", paymentOnDay=" + this.paymentOnDay + ", issueDate=" + this.issueDate + ", productionCalendar=" + this.productionCalendar + ")";
-        }
     }
 }

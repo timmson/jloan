@@ -1,10 +1,10 @@
 package ru.timmson.jloan;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.timmson.jloan.calendar.RussianProductionCalendar;
 
 import static java.math.BigDecimal.valueOf;
+import static java.math.RoundingMode.HALF_EVEN;
 import static java.math.RoundingMode.HALF_UP;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,8 +43,26 @@ public class AnnuityLoanShould {
     }
 
     @Test
-    @Disabled
-    void calculateScheduleWithEarlyRepayment() {
+    void calculateScheduleWithEarlyRepayment1() {
+        final var loan = annuityLoanBuilder()
+                .amount(valueOf(500000))
+                .annualInterestRate(valueOf(11.5))
+                .termInMonth(12)
+                .paymentOnDay(25)
+                .issueDate(of(2016, 10, 25))
+                .addEarlyRepayment(of(2016, 12, 24), valueOf(440000))
+                .productionCalendar(RussianProductionCalendar.getInstance())
+                .build();
+
+        final var schedule = loan.getSchedule();
+
+        assertEquals(14, schedule.getPayments().size());
+        assertEquals(valueOf(2166.20).setScale(2, HALF_UP), schedule.getPayments().get(12).getAmount());
+        assertEquals(valueOf(10173.53), schedule.getOverallInterest());
+    }
+
+    @Test
+    void calculateScheduleWithEarlyRepayment2() {
         final var loan = annuityLoanBuilder()
                 .amount(valueOf(500000))
                 .annualInterestRate(valueOf(11.5))
@@ -57,12 +75,11 @@ public class AnnuityLoanShould {
 
         final var schedule = loan.getSchedule();
 
-        System.out.println(schedule);
-
-        //assertEquals(14, schedule.getPayments().size());
-        //assertEquals(valueOf(22045.78), schedule.getPayments().get(12).getAmount());
-        assertEquals(valueOf(27541.80), schedule.getOverallInterest());
+        assertEquals(13, schedule.getPayments().size());
+        assertEquals(valueOf(43795.12), schedule.getPayments().get(12).getAmount());
+        assertEquals(valueOf(27541.78), schedule.getOverallInterest());
     }
+
 
     @Test
     void calculateScheduleWithFixedPayment() {
