@@ -1,6 +1,5 @@
 package ru.timmson.jloan;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -17,7 +16,6 @@ class LoanScheduleShould {
     private final LoanSchedule loanSchedule = LoanSchedule.build(new LinkedList<>(List.of(firstPayment, lastPayment)));
 
     @Test
-    @Disabled
     void transformToString() {
         final var result = loanSchedule.toString();
 
