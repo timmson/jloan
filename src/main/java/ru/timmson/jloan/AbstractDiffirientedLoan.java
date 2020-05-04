@@ -27,10 +27,11 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
         final var fixedPrincipalPaymentPart = getFixedPrincipalPaymentPart();
         final var earlyRepayment = new TreeMap<>(getEarlyRepayments());
 
-        var i = 0;
         var date = issueDate;
+        final var endDate = issueDate.plusMonths(termInMonth).withDayOfMonth(paymentOnDay);
+
         var lastPayment = payments.getLast();
-        while (i++ < termInMonth && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
+        while (date.isBefore(endDate) && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
             if (!earlyRepayment.isEmpty()) {
@@ -70,7 +71,7 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
                     .calculate(initialBalance, lastPayment.getDate(), date)
                     .add(lastPayment.getInterestAccruedAmount());
 
-            final var principalPayment = (i == termInMonth ? initialBalance : initialBalance.min(fixedPrincipalPaymentPart));
+            final var principalPayment = (date.isEqual(endDate) ? initialBalance : initialBalance.min(fixedPrincipalPaymentPart));
 
             lastPayment = LoanPayment
                     .builder()

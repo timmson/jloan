@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.timmson.jloan.calendar.RussianProductionCalendar;
 
 import static java.math.BigDecimal.valueOf;
-import static java.math.RoundingMode.HALF_EVEN;
 import static java.math.RoundingMode.HALF_UP;
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -93,6 +92,8 @@ public class AnnuityLoanShould {
                 .build();
 
         final var schedule = loan.getSchedule();
+
+        System.out.println(schedule);
 
         assertEquals(schedule.getTermInMonth(), schedule.getPayments().size() - 1);
         assertEquals(valueOf(11804.06), schedule.getPayments().get((int) schedule.getTermInMonth()).getAmount());

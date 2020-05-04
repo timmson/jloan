@@ -46,7 +46,7 @@ class LoanSchedule {
         this.minPaymentAmount = payments.stream().map(LoanPayment::getAmount).min(Comparator.naturalOrder()).orElse(ZERO);
         this.maxPaymentAmount = payments.stream().map(LoanPayment::getAmount).max(Comparator.naturalOrder()).orElse(ZERO);
 
-        this.termInMonth = MONTHS.between(firstPayment.getDate(), lastPayment.getDate());
+        this.termInMonth = MONTHS.between(firstPayment.getDate().withDayOfMonth(1), lastPayment.getDate().withDayOfMonth(1));
         this.amount = firstPayment.getFinalBalance();
 
         this.overallInterest = payments.stream().map(LoanPayment::getInterestAmount).reduce(BigDecimal::add).orElse(ZERO);

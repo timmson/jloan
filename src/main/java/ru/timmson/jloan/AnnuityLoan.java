@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import static java.math.BigDecimal.*;
 import static java.math.MathContext.DECIMAL32;
 import static java.math.RoundingMode.HALF_UP;
+import static java.time.temporal.ChronoUnit.MONTHS;
 
 /**
  * Loan with equals ("annuity") payments
@@ -50,11 +51,11 @@ public class AnnuityLoan extends AbstractLoan {
         final var earlyRepayment = new TreeMap<>(getEarlyRepayments());
         var annuityPayment = getAnnuityPayment();
 
-        var i = 0;
         var date = issueDate;
+        final var endDate = issueDate.plusMonths(termInMonth).withDayOfMonth(paymentOnDay);
 
         var lastPayment = payments.getLast();
-        while (i++ < termInMonth && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
+        while (date.isBefore(endDate) && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
             if (!earlyRepayment.isEmpty()) {
@@ -89,9 +90,15 @@ public class AnnuityLoan extends AbstractLoan {
             }
 
             final var initialBalance = lastPayment.getFinalBalance();
-            final var currentAnnuityPayment = termInMonth - i > 0 ? getAnnuityPayment(initialBalance, termInMonth - i, annualInterestRate) : ZERO;
+            final var currentAnnuityPayment = date.isBefore(endDate) ?
+                    getAnnuityPayment(
+                            initialBalance,
+                            MONTHS.between(date.withDayOfMonth(1), endDate.withDayOfMonth(1)),
+                            annualInterestRate
+                    ) : ZERO;
 
-            annuityPayment = lastPayment.getPaymentType().equals(LoanPaymentType.EARLY) ? currentAnnuityPayment : annuityPayment;
+            annuityPayment = lastPayment.getPaymentType().equals(LoanPaymentType.EARLY) ?
+                    currentAnnuityPayment : annuityPayment;
 
             var interestPayment = getLoanInterestRate()
                     .calculate(initialBalance, lastPayment.getDate(), date)
@@ -99,7 +106,7 @@ public class AnnuityLoan extends AbstractLoan {
 
             var principalPayment = ZERO;
 
-            if (i == termInMonth) {
+            if (date.isEqual(endDate)) {
                 principalPayment = initialBalance;
             }
 
