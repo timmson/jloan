@@ -3,7 +3,8 @@ package ru.timmson.jloan;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.TreeMap;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -18,33 +19,72 @@ public abstract class AbstractDiffirientedLoan extends AbstractLoan {
     /**
      * Generate payments
      *
-     * @return  list of {@link LoanPayment}
+     * @return list of {@link LoanPayment}
      */
     @Override
-    protected final List<LoanPayment> getPayments() {
+    protected final LinkedList<LoanPayment> getPayments() {
         final var payments = initPayments();
         final var fixedPrincipalPaymentPart = getFixedPrincipalPaymentPart();
+        final var earlyRepayment = new TreeMap<>(getEarlyRepayments());
 
         var i = 0;
         var date = issueDate;
-        while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
+        var lastPayment = payments.getLast();
+        while (i++ < termInMonth && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
-            final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
-            final var interestPayment = getLoanInterestRate().calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date);
-            final var principalPayment = (i == termInMonth ? initialBalance : fixedPrincipalPaymentPart);
+            if (!earlyRepayment.isEmpty()) {
+                if (earlyRepayment.firstKey().compareTo(date) < 0) {
+                    final var initialBalance = lastPayment.getFinalBalance();
 
-            payments.add(LoanPayment
+                    final var earlyRepaymentEntry = earlyRepayment.pollFirstEntry();
+                    final var interestAccrued = getLoanInterestRate()
+                            .calculate(
+                                    initialBalance,
+                                    lastPayment.getDate(),
+                                    earlyRepaymentEntry.getKey()
+                            ).add(lastPayment.getInterestAccruedAmount());
+
+                    final var payment = initialBalance.min(earlyRepaymentEntry.getValue());
+
+                    lastPayment = LoanPayment
+                            .builder()
+                            .paymentType(LoanPaymentType.EARLY)
+                            .initialBalance(initialBalance)
+                            .date(earlyRepaymentEntry.getKey())
+                            .amount(payment)
+                            .principalAmount(payment)
+                            .interestAmount(ZERO)
+                            .interestAccruedAmount(interestAccrued)
+                            .interestRate(this.annualInterestRate)
+                            .finalBalance(initialBalance.subtract(payment))
+                            .build();
+
+                    payments.add(lastPayment);
+                }
+            }
+
+            final var initialBalance = lastPayment.getFinalBalance();
+
+            final var interestPayment = getLoanInterestRate()
+                    .calculate(initialBalance, lastPayment.getDate(), date)
+                    .add(lastPayment.getInterestAccruedAmount());
+
+            final var principalPayment = (i == termInMonth ? initialBalance : initialBalance.min(fixedPrincipalPaymentPart));
+
+            lastPayment = LoanPayment
                     .builder()
                     .initialBalance(initialBalance)
                     .date(date)
                     .principalAmount(principalPayment)
                     .interestAmount(interestPayment)
+                    .interestAccruedAmount(ZERO)
                     .amount(principalPayment.add(interestPayment))
                     .interestRate(this.annualInterestRate)
                     .finalBalance(initialBalance.subtract(principalPayment))
-                    .build()
-            );
+                    .build();
+
+            payments.add(lastPayment);
 
         }
         return payments;

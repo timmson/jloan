@@ -3,7 +3,7 @@ package ru.timmson.jloan;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -45,32 +45,35 @@ public class AnnuityLoan extends AbstractLoan {
      * @return list of {@link LoanPayment}
      */
     @Override
-    protected List<LoanPayment> getPayments() {
+    protected LinkedList<LoanPayment> getPayments() {
         final var payments = initPayments();
-        final var tempEarlyRepayment = new TreeMap<>(getEarlyRepayments());
+        final var earlyRepayment = new TreeMap<>(getEarlyRepayments());
         var annuityPayment = getAnnuityPayment();
 
         var i = 0;
         var date = issueDate;
-        while (i++ < termInMonth && payments.get(payments.size() - 1).getFinalBalance().compareTo(ZERO) > 0) {
+
+        var lastPayment = payments.getLast();
+        while (i++ < termInMonth && lastPayment.getFinalBalance().compareTo(ZERO) > 0) {
             date = getNextWorkingDate(date.plusMonths(1).withDayOfMonth(paymentOnDay));
 
-            if (!tempEarlyRepayment.isEmpty()) {
-                if (tempEarlyRepayment.firstKey().compareTo(date) < 0) {
-                    final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
+            if (!earlyRepayment.isEmpty()) {
+                if (earlyRepayment.firstKey().compareTo(date) < 0) {
+                    final var initialBalance = lastPayment.getFinalBalance();
 
-                    final var earlyRepaymentEntry = tempEarlyRepayment.pollFirstEntry();
+                    final var earlyRepaymentEntry = earlyRepayment.pollFirstEntry();
                     final var interestAccrued = getLoanInterestRate()
                             .calculate(
                                     initialBalance,
-                                    payments.get(payments.size() - 1).getDate(),
+                                    lastPayment.getDate(),
                                     earlyRepaymentEntry.getKey()
-                            ).add(payments.get(payments.size() - 1).getInterestAccruedAmount());
+                            ).add(lastPayment.getInterestAccruedAmount());
 
                     final var payment = initialBalance.min(earlyRepaymentEntry.getValue());
-                    payments.add(LoanPayment
+
+                    lastPayment = LoanPayment
                             .builder()
-                            .paymentType(LoanPayment.LoanPaymentType.EARLY)
+                            .paymentType(LoanPaymentType.EARLY)
                             .initialBalance(initialBalance)
                             .date(earlyRepaymentEntry.getKey())
                             .amount(payment)
@@ -79,19 +82,20 @@ public class AnnuityLoan extends AbstractLoan {
                             .interestAccruedAmount(interestAccrued)
                             .interestRate(this.annualInterestRate)
                             .finalBalance(initialBalance.subtract(payment))
-                            .build()
-                    );
+                            .build();
+
+                    payments.add(lastPayment);
                 }
             }
 
-            final var initialBalance = payments.get(payments.size() - 1).getFinalBalance();
+            final var initialBalance = lastPayment.getFinalBalance();
             final var currentAnnuityPayment = termInMonth - i > 0 ? getAnnuityPayment(initialBalance, termInMonth - i, annualInterestRate) : ZERO;
 
-            annuityPayment = payments.get(payments.size() - 1).getPaymentType().equals(LoanPayment.LoanPaymentType.EARLY) ? currentAnnuityPayment : annuityPayment;
+            annuityPayment = lastPayment.getPaymentType().equals(LoanPaymentType.EARLY) ? currentAnnuityPayment : annuityPayment;
 
             var interestPayment = getLoanInterestRate()
-                    .calculate(initialBalance, payments.get(payments.size() - 1).getDate(), date)
-                    .add(payments.get(payments.size() - 1).getInterestAccruedAmount());
+                    .calculate(initialBalance, lastPayment.getDate(), date)
+                    .add(lastPayment.getInterestAccruedAmount());
 
             var principalPayment = ZERO;
 
@@ -105,7 +109,7 @@ public class AnnuityLoan extends AbstractLoan {
 
             final var payment = principalPayment.add(interestPayment);
 
-            payments.add(LoanPayment
+            lastPayment = LoanPayment
                     .builder()
                     .initialBalance(initialBalance)
                     .date(date)
@@ -116,8 +120,9 @@ public class AnnuityLoan extends AbstractLoan {
                     .interestAccruedAmount(ZERO)
                     .interestRate(this.annualInterestRate)
                     .finalBalance(initialBalance.subtract(principalPayment))
-                    .build()
-            );
+                    .build();
+
+            payments.add(lastPayment);
 
         }
         return payments;

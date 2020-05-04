@@ -46,7 +46,4 @@ public class LoanPayment {
                 this.principalAmount, this.interestAmount, this.finalBalance);
     }
 
-    protected enum LoanPaymentType {
-        REGULAR, EARLY
-    }
 }

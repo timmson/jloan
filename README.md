@@ -25,3 +25,27 @@ class Example {
     }
 }
 ````
+
+## Set fixed payment
+````java
+final Loan loan = annuityLoanBuilder()
+...
+    .paymentAmount(valueOf(57000)) //57000.00 will be setted as payment through all monthes except last
+...
+````
+
+## Set production calendar
+````java
+final Loan loan = annuityLoanBuilder()
+...
+    .productionCalendar(RussianProductionCalendar.getInstance()) // you can implement ProductionCalendar youself
+...
+````
+
+### Add Early repayment
+````java
+final Loan loan = annuityLoanBuilder()
+...
+    addEarlyRepayment(of(2016, 12, 26), valueOf(44000)) // you can implement ProductionCalendar youself
+...
+````

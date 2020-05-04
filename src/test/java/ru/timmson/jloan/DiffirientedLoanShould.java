@@ -44,4 +44,23 @@ public class DiffirientedLoanShould {
         assertEquals(valueOf(4203.39), schedule.getPayments().get(12).getAmount());
         assertEquals(valueOf(3116.44), schedule.getOverallInterest());
     }
+
+    @Test
+    void calculateScheduleWithEarlyRepayment() {
+        final var loan = differentiatedLoanBuilder()
+                .amount(valueOf(50000))
+                .annualInterestRate(valueOf(11.5))
+                .termInMonth(12)
+                .paymentOnDay(25)
+                .issueDate(of(2020, 10, 25))
+                .addEarlyRepayment(of(2020, 12, 25), valueOf(15000))
+                .productionCalendar(RussianProductionCalendar.getInstance())
+                .build();
+
+        final var schedule = loan.getSchedule();
+
+        assertEquals(11, schedule.getPayments().size());
+        assertEquals(valueOf(1682.92), schedule.getPayments().get(10).getAmount());
+        assertEquals(valueOf(1868.33), schedule.getOverallInterest());
+    }
 }

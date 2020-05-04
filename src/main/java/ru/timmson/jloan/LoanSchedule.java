@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -32,12 +33,12 @@ class LoanSchedule {
     private final BigDecimal amount;
     private final BigDecimal efficientRate;
     private final BigDecimal fullAmount;
-    private final List<LoanPayment> payments;
+    private final LinkedList<LoanPayment> payments;
 
-    public LoanSchedule(List<LoanPayment> payments) {
+    public LoanSchedule(LinkedList<LoanPayment> payments) {
         this.payments = payments;
-        final var firstPayment = payments.get(0);
-        final var lastPayment = payments.get(payments.size() - 1);
+        final var firstPayment = payments.getFirst();
+        final var lastPayment = payments.getLast();
 
         this.firstPayment = payments.get(1).getAmount();
         this.lastPayment = lastPayment.getAmount();
@@ -53,7 +54,7 @@ class LoanSchedule {
         this.fullAmount = this.overallInterest.add(this.amount);
     }
 
-    public static LoanSchedule build(List<LoanPayment> payments) {
+    public static LoanSchedule build(LinkedList<LoanPayment> payments) {
         return new LoanSchedule(payments);
     }
 

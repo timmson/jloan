@@ -4,7 +4,10 @@ import ru.timmson.jloan.calendar.ProductionCalendar;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -37,8 +40,8 @@ abstract class AbstractLoan implements Loan {
         this.earlyRepayments = b.earlyRepayments;
     }
 
-    protected final List<LoanPayment> initPayments() {
-        final var payments = new ArrayList<LoanPayment>();
+    protected final LinkedList<LoanPayment> initPayments() {
+        final var payments = new LinkedList<LoanPayment>();
         payments.add(LoanPayment
                 .builder()
                 .date(this.issueDate)
@@ -78,7 +81,7 @@ abstract class AbstractLoan implements Loan {
      *
      * @return list of {@link LoanPayment}
      */
-    protected abstract List<LoanPayment> getPayments();
+    protected abstract LinkedList<LoanPayment> getPayments();
 
     /**
      * Returns next working date if ProductionCalendar is not null
