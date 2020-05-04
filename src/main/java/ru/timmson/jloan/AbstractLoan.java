@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import static java.math.BigDecimal.ZERO;
+import static java.math.BigDecimal.valueOf;
+import static java.time.LocalDate.of;
 
 /**
  * {@link AbstractLoan} class
@@ -18,6 +20,7 @@ import static java.math.BigDecimal.ZERO;
  */
 abstract class AbstractLoan implements Loan {
 
+    private final LoanInterestRate interestRate;
     protected BigDecimal amount;
     protected BigDecimal annualInterestRate;
     protected long termInMonth;
@@ -25,8 +28,6 @@ abstract class AbstractLoan implements Loan {
     protected LocalDate issueDate;
     protected ProductionCalendar productionCalendar;
     protected Map<LocalDate, BigDecimal> earlyRepayments;
-
-    private final LoanInterestRate interestRate;
     private LoanSchedule loanSchedule;
 
     protected AbstractLoan(AbstractLoanBuilder<?, ?> b) {
@@ -97,6 +98,7 @@ abstract class AbstractLoan implements Loan {
     }
 
     public static abstract class AbstractLoanBuilder<C extends AbstractLoan, B extends AbstractLoan.AbstractLoanBuilder<C, B>> {
+        private final Map<LocalDate, BigDecimal> earlyRepayments = new HashMap<>();
         private BigDecimal amount;
         private BigDecimal annualInterestRate;
         private long termInMonth;
@@ -104,17 +106,36 @@ abstract class AbstractLoan implements Loan {
         private LocalDate issueDate;
         private ProductionCalendar productionCalendar;
         private LoanInterestRate interestRate;
-        private final Map<LocalDate, BigDecimal> earlyRepayments = new HashMap<>();
 
+        /**
+         * Sets loan amount
+         *
+         * @param amount, eg 15000
+         * @return {@link B}
+         */
         public B amount(BigDecimal amount) {
             this.amount = amount;
             return self();
+        }
+
+        /**
+         * Sets loan amount
+         *
+         * @param amount, eg 15000
+         * @return {@link B}
+         */
+        public B amount(double amount) {
+            return amount(valueOf(amount));
         }
 
         public B annualInterestRate(BigDecimal annualInterestRate) {
             this.annualInterestRate = annualInterestRate;
             this.interestRate = new LoanInterestRate(annualInterestRate);
             return self();
+        }
+
+        public B annualInterestRate(double annualInterestRate) {
+            return annualInterestRate(valueOf(annualInterestRate));
         }
 
         public B termInMonth(long termInMonth) {
@@ -127,9 +148,27 @@ abstract class AbstractLoan implements Loan {
             return self();
         }
 
+        /**
+         * Sets issue date
+         *
+         * @param issueDate {@link LocalDate} , e.g 2020-10-15
+         * @return {@link B}
+         */
         public B issueDate(LocalDate issueDate) {
             this.issueDate = issueDate;
             return self();
+        }
+
+        /**
+         * Sets issue date
+         *
+         * @param year,       e.g 2020
+         * @param month,      e.g 10 (October)
+         * @param dayOfMonth, eg 15
+         * @return {@link B}
+         */
+        public B issueDate(int year, int month, int dayOfMonth) {
+            return issueDate(of(year, month, dayOfMonth));
         }
 
         public B productionCalendar(ProductionCalendar productionCalendar) {
@@ -137,11 +176,31 @@ abstract class AbstractLoan implements Loan {
             return self();
         }
 
+        /**
+         * Adds early repayment
+         *
+         * @param date    {@link LocalDate} , e.g 2020-10-15
+         * @param amount, eg 15000
+         * @return {@link B}
+         */
         public B addEarlyRepayment(LocalDate date, BigDecimal amount) {
             synchronized (earlyRepayments) {
                 earlyRepayments.put(date, amount.add(earlyRepayments.getOrDefault(date, ZERO)));
             }
             return self();
+        }
+
+        /**
+         * Adds early repayment
+         *
+         * @param year,       e.g 2020
+         * @param month,      e.g 10 (October)
+         * @param dayOfMonth, eg 15
+         * @param amount,     eg 15000
+         * @return {@link B}
+         */
+        public B addEarlyRepayment(int year, int month, int dayOfMonth, double amount) {
+            return addEarlyRepayment(of(year, month, dayOfMonth), valueOf(amount));
         }
 
         protected abstract B self();

@@ -1,7 +1,5 @@
 package ru.timmson.jloan;
 
-import lombok.experimental.SuperBuilder;
-
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -19,10 +17,18 @@ import static java.time.temporal.ChronoUnit.MONTHS;
  *
  * @author Artem Krotov
  */
-@SuperBuilder
 public class AnnuityLoan extends AbstractLoan {
 
     protected BigDecimal paymentAmount;
+
+    protected AnnuityLoan(AnnuityLoanBuilder<?, ?> b) {
+        super(b);
+        this.paymentAmount = b.paymentAmount;
+    }
+
+    public static AnnuityLoanBuilder<?, ?> builder() {
+        return new AnnuityLoanBuilderImpl();
+    }
 
     /**
      * Returns annuity payment amount
@@ -135,4 +141,49 @@ public class AnnuityLoan extends AbstractLoan {
         return payments;
     }
 
+    public static abstract class AnnuityLoanBuilder<C extends AnnuityLoan, B extends AnnuityLoanBuilder<C, B>> extends AbstractLoanBuilder<C, B> {
+        private BigDecimal paymentAmount;
+
+        /**
+         * Set fixed payment amount
+         *
+         * @param paymentAmount - fixed payment amount
+         * @return {@link B}
+         */
+        public B paymentAmount(BigDecimal paymentAmount) {
+            this.paymentAmount = paymentAmount;
+            return self();
+        }
+
+        /**
+         * Set fixed payment amount
+         *
+         * @param paymentAmount - fixed payment amount
+         * @return {@link B}
+         */
+        public B paymentAmount(double paymentAmount) {
+            return paymentAmount(valueOf(paymentAmount));
+        }
+
+        protected abstract B self();
+
+        public abstract C build();
+
+        public String toString() {
+            return "AnnuityLoan.AnnuityLoanBuilder(super=" + super.toString() + ", paymentAmount=" + this.paymentAmount + ")";
+        }
+    }
+
+    private static final class AnnuityLoanBuilderImpl extends AnnuityLoanBuilder<AnnuityLoan, AnnuityLoanBuilderImpl> {
+        private AnnuityLoanBuilderImpl() {
+        }
+
+        protected AnnuityLoan.AnnuityLoanBuilderImpl self() {
+            return this;
+        }
+
+        public AnnuityLoan build() {
+            return new AnnuityLoan(this);
+        }
+    }
 }

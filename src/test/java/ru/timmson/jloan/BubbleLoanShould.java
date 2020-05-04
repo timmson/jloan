@@ -14,7 +14,7 @@ public class BubbleLoanShould {
     void calculateSchedule() {
         final var loan = bubbleLoanBuilder()
                 .amount(valueOf(50000))
-                .annualInterestRate(valueOf(11.5))
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
                 .issueDate(of(2016, 10, 25))

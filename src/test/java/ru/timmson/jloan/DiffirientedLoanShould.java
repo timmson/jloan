@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.timmson.jloan.calendar.RussianProductionCalendar;
 
 import static java.math.BigDecimal.valueOf;
-import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.timmson.jloan.LoanFactory.differentiatedLoanBuilder;
 
@@ -14,10 +13,10 @@ public class DiffirientedLoanShould {
     void calculateSchedule() {
         final var loan = differentiatedLoanBuilder()
                 .amount(valueOf(50000))
-                .annualInterestRate(valueOf(11.5))
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2020, 10, 25))
+                .issueDate(2020, 10, 25)
                 .build();
 
         final var schedule = loan.getSchedule();
@@ -30,11 +29,11 @@ public class DiffirientedLoanShould {
     @Test
     void calculateScheduleWithRussianCalendar() {
         final var loan = differentiatedLoanBuilder()
-                .amount(valueOf(50000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(50000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2020, 10, 25))
+                .issueDate(2020, 10, 25)
                 .productionCalendar(RussianProductionCalendar.getInstance())
                 .build();
 
@@ -48,12 +47,12 @@ public class DiffirientedLoanShould {
     @Test
     void calculateScheduleWithEarlyRepayment() {
         final var loan = differentiatedLoanBuilder()
-                .amount(valueOf(50000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(50000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2020, 10, 25))
-                .addEarlyRepayment(of(2020, 12, 25), valueOf(15000))
+                .issueDate(2020, 10, 25)
+                .addEarlyRepayment(2020, 12, 25, 15000)
                 .productionCalendar(RussianProductionCalendar.getInstance())
                 .build();
 

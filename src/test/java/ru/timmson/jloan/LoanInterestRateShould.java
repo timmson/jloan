@@ -11,6 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class LoanInterestRateShould {
 
     @Test
+    void instantiateFromBigDecimalOrFloat() {
+        final var result1 = new LoanInterestRate(16.8f);
+        final var result2 = new LoanInterestRate(valueOf(16.8));
+
+        assertEquals(0, result1.compareTo(result2));
+    }
+
+    @Test
     void calculateAmountOfPercentWhenDaysGiven() {
         final var loanYear = new LoanInterestRate(valueOf(16.8));
 

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.timmson.jloan.calendar.RussianProductionCalendar;
 
 import static java.math.BigDecimal.valueOf;
-import static java.math.RoundingMode.HALF_UP;
-import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.timmson.jloan.LoanFactory.annuityLoanBuilder;
 
@@ -14,8 +12,8 @@ public class AnnuityLoanShould {
     @Test
     void calculateAnnuityAmount() {
         final var loan = annuityLoanBuilder()
-                .amount(valueOf(110000))
-                .annualInterestRate(valueOf(12.9))
+                .amount(110000)
+                .annualInterestRate(12.9)
                 .termInMonth(60)
                 .build();
 
@@ -27,11 +25,11 @@ public class AnnuityLoanShould {
     @Test
     void calculateSchedule() {
         final var loan = annuityLoanBuilder()
-                .amount(valueOf(500000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(500000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2018, 10, 25))
+                .issueDate(2018, 10, 25)
                 .build();
 
         final var schedule = loan.getSchedule();
@@ -45,30 +43,30 @@ public class AnnuityLoanShould {
     void calculateScheduleWithEarlyRepayment1() {
         final var loan = annuityLoanBuilder()
                 .amount(valueOf(500000))
-                .annualInterestRate(valueOf(11.5))
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2016, 10, 25))
-                .addEarlyRepayment(of(2016, 12, 24), valueOf(440000))
+                .issueDate(2016, 10, 25)
+                .addEarlyRepayment(2016, 12, 24, 440000)
                 .productionCalendar(RussianProductionCalendar.getInstance())
                 .build();
 
         final var schedule = loan.getSchedule();
 
         assertEquals(14, schedule.getPayments().size());
-        assertEquals(valueOf(2166.20).setScale(2, HALF_UP), schedule.getPayments().get(12).getAmount());
+        assertEquals(0, valueOf(2166.20).compareTo(schedule.getPayments().get(12).getAmount()));
         assertEquals(valueOf(10173.53), schedule.getOverallInterest());
     }
 
     @Test
     void calculateScheduleWithEarlyRepayment2() {
         final var loan = annuityLoanBuilder()
-                .amount(valueOf(500000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(500000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(25)
-                .issueDate(of(2016, 10, 25))
-                .addEarlyRepayment(of(2016, 12, 26), valueOf(44000))
+                .issueDate(2016, 10, 25)
+                .addEarlyRepayment(2016, 12, 26, 44000)
                 .productionCalendar(RussianProductionCalendar.getInstance())
                 .build();
 
@@ -83,17 +81,15 @@ public class AnnuityLoanShould {
     @Test
     void calculateScheduleWithFixedPayment() {
         final var loan = annuityLoanBuilder()
-                .amount(valueOf(500000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(500000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
-                .paymentAmount(valueOf(57000))
+                .paymentAmount(57000)
                 .paymentOnDay(25)
-                .issueDate(of(2018, 10, 25))
+                .issueDate(2018, 10, 25)
                 .build();
 
         final var schedule = loan.getSchedule();
-
-        System.out.println(schedule);
 
         assertEquals(schedule.getTermInMonth(), schedule.getPayments().size() - 1);
         assertEquals(valueOf(11804.06), schedule.getPayments().get((int) schedule.getTermInMonth()).getAmount());
@@ -103,11 +99,11 @@ public class AnnuityLoanShould {
     @Test
     void calculateScheduleWithRussianCalendar() {
         final var loan = annuityLoanBuilder()
-                .amount(valueOf(500000))
-                .annualInterestRate(valueOf(11.5))
+                .amount(500000)
+                .annualInterestRate(11.5)
                 .termInMonth(12)
                 .paymentOnDay(5)
-                .issueDate(of(2018, 10, 15))
+                .issueDate(2018, 10, 15)
                 .productionCalendar(RussianProductionCalendar.getInstance())
                 .build();
 
@@ -115,6 +111,6 @@ public class AnnuityLoanShould {
 
         assertEquals(13, schedule.getPayments().size());
         assertEquals(valueOf(42623.17), schedule.getPayments().get(12).getAmount());
-        assertEquals(valueOf(30006.00).setScale(2, HALF_UP), schedule.getOverallInterest());
+        assertEquals(0, valueOf(30006.00).compareTo(schedule.getOverallInterest()));
     }
 }

@@ -1,9 +1,11 @@
 package ru.timmson.jloan;
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static java.math.BigDecimal.valueOf;
 import static java.math.MathContext.DECIMAL32;
@@ -16,18 +18,28 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
  *
  * @author Artem Krotov
  */
+@ToString
 @EqualsAndHashCode
-class LoanInterestRate {
+class LoanInterestRate implements Comparable<LoanInterestRate> {
 
     private final BigDecimal interestRate;
 
     /**
      * Creates {@link LoanInterestRate}
      *
-     * @param annualInterestRate - annual interest rate, e.g. 14.99
+     * @param annualInterestRate - annual interest rate, e.g. 14.99 of BigDecimal
      */
     public LoanInterestRate(BigDecimal annualInterestRate) {
         this.interestRate = annualInterestRate.divide(valueOf(100), DECIMAL32);
+    }
+
+    /**
+     * Creates {@link LoanInterestRate}
+     *
+     * @param annualInterestRate - annual interest rate, e.g. 14.99 of float/double
+     */
+    public LoanInterestRate(double annualInterestRate) {
+        this(valueOf(annualInterestRate));
     }
 
     /**
@@ -40,7 +52,8 @@ class LoanInterestRate {
      */
     public BigDecimal calculate(BigDecimal amount, long days, boolean isLeapYear) {
         return this.interestRate
-                .multiply(valueOf(days)).divide(valueOf(isLeapYear ? 366 : 365), DECIMAL32)
+                .multiply(valueOf(days))
+                .divide(valueOf(isLeapYear ? 366 : 365), DECIMAL32)
                 .multiply(amount).setScale(2, HALF_UP);
     }
 
@@ -62,5 +75,10 @@ class LoanInterestRate {
             lastDayOfYear = lastDayOfYear.plusYears(1);
         }
         return percentAmount.add(calculate(amount, DAYS.between(slidingFrom, to), to.isLeapYear()));
+    }
+
+    @Override
+    public int compareTo(LoanInterestRate o) {
+        return interestRate.compareTo(Objects.requireNonNull(o).interestRate);
     }
 }
