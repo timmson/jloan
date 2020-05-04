@@ -13,14 +13,14 @@ public class RussianProductionCalendarShould {
 
     @Test
     void returnHolidayFrom1to8ofJanuary2020() {
-        assertTrue(ruCalendar.isHoliday(of(2020, 1, 1)));
-        assertTrue(ruCalendar.isHoliday(of(2020, 1, 4)));
-        assertTrue(ruCalendar.isHoliday(of(2020, 1, 8)));
+        assertTrue(ruCalendar.isHoliday(2020, 1, 1));
+        assertTrue(ruCalendar.isHoliday(2020, 1, 4));
+        assertTrue(ruCalendar.isHoliday(2020, 1, 8));
     }
 
     @Test
     void returnNextWorkingDayInCurrentMonth() {
-        assertEquals(of(2020, 5, 6), ruCalendar.getNextWorkDay(of(2020, 5, 4)));
-        assertEquals(of(2020, 5, 29), ruCalendar.getNextWorkDay(of(2020, 5, 31)));
+        assertEquals(of(2020, 5, 6), ruCalendar.getNextWorkDay(2020, 5, 4));
+        assertEquals(of(2020, 5, 29), ruCalendar.getNextWorkDay(2020, 5, 31));
     }
 }
